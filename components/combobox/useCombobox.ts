@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import useFilteredOptions from "./filterHook";
-import { ComboboxProps, Option } from "./combobox";
+import { ComboboxProps, Option } from "./Combobox";
 
 interface UseComboboxProps<T extends { value: string; label: string }>
   extends Omit<ComboboxProps<T>, "value" | "label"> {

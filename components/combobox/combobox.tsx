@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, KeyboardEvent } from "react";
+import React from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import useCombobox from "./useCombobox";
+import styles from "./Combobox.module.scss";
 
 export interface Option {
   value: string;
@@ -28,6 +29,7 @@ export interface ComboboxProps<T extends Option> {
   updateOptions: (options: T[]) => void;
   label?: string;
 }
+
 export function Combobox<T extends Option>({
   value,
   onChange,
@@ -55,21 +57,24 @@ export function Combobox<T extends Option>({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[100%] justify-between"
+          className={styles.comboboxButton}
           ref={buttonRef}
         >
           {selectedValue
             ? options.find((option) => option.value === selectedValue)?.label
             : label}
-          <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <CaretSortIcon className={styles.icon} />
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent style={{ width: `${buttonWidth}px` }} className="p-0">
+      <PopoverContent
+        style={{ width: `${buttonWidth}px` }}
+        className={styles.popoverContent}
+      >
         <Command>
           <CommandInput
             placeholder="Search option..."
-            className="h-9"
+            className={styles.commandInput}
             onValueChange={setInputValue}
             onKeyDown={handleKeyPress}
           />
@@ -83,14 +88,12 @@ export function Combobox<T extends Option>({
                 key={option.value}
                 value={option.value}
                 onSelect={() => handleSelect(option.value)}
+                className={styles.commandItem}
               >
                 {option.label}
-                <CheckIcon
-                  className={cn(
-                    "ml-auto h-4 w-4",
-                    selectedValue === option.value ? "opacity-100" : "opacity-0"
-                  )}
-                />
+                {selectedValue === option.value && (
+                  <CheckIcon className={styles.icon} />
+                )}
               </CommandItem>
             ))}
           </CommandGroup>

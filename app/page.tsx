@@ -1,5 +1,5 @@
 "use client";
-import { Combobox } from "@/components/combobox/combobox";
+import { Combobox } from "@/components/combobox/Combobox";
 import { useState } from "react";
 
 interface MyOptionType {
