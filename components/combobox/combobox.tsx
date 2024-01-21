@@ -1,8 +1,7 @@
 "use client";
-
 import * as React from "react";
+import { useRef, useState, useEffect, KeyboardEvent } from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,82 +16,48 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useEffect, useRef, useState } from "react";
 
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-];
+interface ComboboxProps<T extends { value: string; label: string }> {
+  value: string;
+  onChange: (value: string) => void;
+  options: T[];
+  updateOptions: (options: T[]) => void;
+  label?: string;
+}
 
-export function Combobox() {
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+export function Combobox<T extends { value: string; label: string }>({
+  value,
+  onChange,
+  options,
+  updateOptions,
+  label = "Select option...",
+}: ComboboxProps<T>): JSX.Element {
+  const [open, setOpen] = useState<boolean>(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [buttonWidth, setButtonWidth] = useState(0);
-  const [inputValue, setInputValue] = useState("");
+  const [buttonWidth, setButtonWidth] = useState<number>(0);
+  const [inputValue, setInputValue] = useState<string>("");
 
   useEffect(() => {
     if (buttonRef.current) {
       setButtonWidth(buttonRef.current.offsetWidth);
     }
   }, []);
-  const [frameworks, setFrameworks] = useState([
-    {
-      value: "next.js",
-      label: "Next.js",
-    },
-    {
-      value: "sveltekit",
-      label: "SvelteKit",
-    },
-    {
-      value: "nuxt.js",
-      label: "Nuxt.js",
-    },
-    {
-      value: "remix",
-      label: "Remix",
-    },
-    {
-      value: "astro",
-      label: "Astro",
-    },
-  ]);
-  const handleSelect = (currentValue: string) => {
-    setValue(currentValue === value ? "" : currentValue);
+
+  const handleSelect = (currentValue: string): void => {
+    onChange(currentValue === value ? "" : currentValue);
     setOpen(false);
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === "Enter" && inputValue) {
-      const newFramework = {
+      const newOption: T = {
         value: inputValue.toLowerCase(),
         label: inputValue,
-      };
-      if (
-        !frameworks.some((framework) => framework.value === newFramework.value)
-      ) {
-        setFrameworks([...frameworks, newFramework]);
+      } as T;
+      if (!options.some((option) => option.value === newOption.value)) {
+        updateOptions([...options, newOption]);
       }
-      handleSelect(newFramework.value);
+      handleSelect(newOption.value);
       setInputValue("");
     }
   };
@@ -108,8 +73,8 @@ export function Combobox() {
           ref={buttonRef}
         >
           {value
-            ? frameworks.find((framework) => framework.value === value)?.label
-            : "Select framework..."}
+            ? options.find((option) => option.value === value)?.label
+            : label}
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -117,27 +82,27 @@ export function Combobox() {
       <PopoverContent style={{ width: `${buttonWidth}px` }} className="p-0">
         <Command onKeyDown={handleKeyPress}>
           <CommandInput
-            placeholder="Search framework..."
+            placeholder="Search option..."
             className="h-9"
             value={inputValue}
             onValueChange={setInputValue}
           />
-          {frameworks.length === 0 && (
-            <CommandEmpty>No framework found.</CommandEmpty>
+          {options.length === 0 && (
+            <CommandEmpty>No options found.</CommandEmpty>
           )}
 
           <CommandGroup>
-            {frameworks.map((framework) => (
+            {options.map((option) => (
               <CommandItem
-                key={framework.value}
-                value={framework.value}
-                onSelect={() => handleSelect(framework.value)}
+                key={option.value}
+                value={option.value}
+                onSelect={() => handleSelect(option.value)}
               >
-                {framework.label}
+                {option.label}
                 <CheckIcon
                   className={cn(
                     "ml-auto h-4 w-4",
-                    value === framework.value ? "opacity-100" : "opacity-0"
+                    value === option.value ? "opacity-100" : "opacity-0"
                   )}
                 />
               </CommandItem>
