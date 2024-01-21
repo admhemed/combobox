@@ -2,17 +2,11 @@ import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import useFilteredOptions from "./filterHook";
 import { ComboboxProps, Option } from "./Combobox";
 
-interface UseComboboxProps<T extends { value: string; label: string }>
-  extends Omit<ComboboxProps<T>, "value" | "label"> {
-  initialValue?: string;
-}
 interface UseComboboxReturn<T extends Option> {
-  selectedValue: string;
   filteredOptions: T[];
-  handleSelect: (value: string) => void;
+  handleSelect: (option: T) => void;
   handleKeyPress: (event: KeyboardEvent<HTMLInputElement>) => void;
   buttonWidth: number;
-  inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -22,10 +16,8 @@ interface UseComboboxReturn<T extends Option> {
 function useCombobox<T extends Option>({
   onChange,
   options,
-  initialValue = "",
   updateOptions,
-}: UseComboboxProps<T>): UseComboboxReturn<T> {
-  const [selectedValue, setSelectedValue] = useState<string>(initialValue);
+}: Omit<ComboboxProps<T>, "selectedOption">): UseComboboxReturn<T> {
   const [inputValue, setInputValue] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -37,36 +29,38 @@ function useCombobox<T extends Option>({
     }
   }, []);
 
-  const filteredOptions = useFilteredOptions(options, inputValue);
+  const filteredOptions = useFilteredOptions(options, inputValue) as T[];
 
-  const handleSelect = (value: string): void => {
-    onChange(value === selectedValue ? "" : value);
-    setSelectedValue(value === selectedValue ? "" : value);
+  const handleSelect = (option: T): void => {
+    // onChange(option.value === selectedValue ? "" : option.value);
+    onChange(option);
+
     setOpen(false);
     setInputValue("");
   };
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === "Enter" && inputValue) {
-      setOpen(false);
-      const newOption: T = {
-        value: inputValue.toLowerCase(),
-        label: inputValue,
-      } as T;
-      if (!options.some((option) => option.value === newOption.value)) {
-        updateOptions([...options, newOption]);
+      if (
+        !options.some((option) => option.value === inputValue.toLowerCase())
+      ) {
+        const newOption: T = {
+          value: inputValue.toLowerCase(),
+          label: inputValue,
+        } as T;
+
+        updateOptions([...options, newOption] as T[]);
+
+        handleSelect(newOption);
       }
-      handleSelect(newOption.value);
     }
   };
 
   return {
-    selectedValue,
     filteredOptions,
     handleSelect,
     handleKeyPress,
     buttonWidth,
-    inputValue,
     setInputValue,
     open,
     setOpen,

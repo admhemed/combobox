@@ -21,35 +21,37 @@ export interface Option {
   value: string;
   label: string;
   icon?: string;
+  description?: string;
 }
 
 export interface ComboboxProps<T extends Option> {
-  value: string;
-  onChange: (value: string) => void;
+  selectedOption: T | null;
+  onChange: (option: T) => void;
   options: T[];
   updateOptions: (options: T[]) => void;
   label?: string;
 }
-
 export function Combobox<T extends Option>({
-  value,
+  selectedOption,
   onChange,
   options,
   updateOptions,
   label = "Select option...",
 }: ComboboxProps<T>): JSX.Element {
   const {
-    selectedValue,
     filteredOptions,
     handleSelect,
     handleKeyPress,
     buttonWidth,
-    inputValue,
     setInputValue,
     open,
     setOpen,
     buttonRef,
-  } = useCombobox<T>({ onChange, options, initialValue: value, updateOptions });
+  } = useCombobox<T>({
+    onChange,
+    options,
+    updateOptions,
+  });
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -61,9 +63,7 @@ export function Combobox<T extends Option>({
           className={styles.comboboxButton}
           ref={buttonRef}
         >
-          {selectedValue
-            ? options.find((option) => option.value === selectedValue)?.label
-            : label}
+          {selectedOption?.label || label}
           <CaretSortIcon className={styles.icon} />
         </Button>
       </PopoverTrigger>
@@ -72,7 +72,7 @@ export function Combobox<T extends Option>({
         style={{ width: `${buttonWidth}px` }}
         className={styles.popoverContent}
       >
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput
             placeholder="Search option..."
             className={styles.commandInput}
@@ -84,25 +84,28 @@ export function Combobox<T extends Option>({
           )}
 
           <CommandGroup className={styles.commandGroup}>
-            {filteredOptions.map((option) => (
-              <CommandItem
-                key={option.value}
-                value={option.value}
-                onSelect={() => handleSelect(option.value)}
-                className={styles.commandItem}
-              >
-                <div>
-                  {option.label}
-                  {option.icon && (
-                    <span dangerouslySetInnerHTML={{ __html: option.icon }} />
-                  )}
-                </div>
+            {filteredOptions.map((option) => {
+              console.log(option); // just for demonstration and debugging
+              return (
+                <CommandItem
+                  key={option.value}
+                  value={`${option.value} ${option.label} ${option.description}`}
+                  onSelect={() => handleSelect(option)}
+                  className={styles.commandItem}
+                >
+                  <div>
+                    {option.label}
+                    {option.icon && (
+                      <span dangerouslySetInnerHTML={{ __html: option.icon }} />
+                    )}
+                  </div>
 
-                {selectedValue === option.value && (
-                  <CheckIcon className={styles.icon} />
-                )}
-              </CommandItem>
-            ))}
+                  {selectedOption?.value === option.value && (
+                    <CheckIcon className={styles.icon} />
+                  )}
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
         </Command>
       </PopoverContent>
