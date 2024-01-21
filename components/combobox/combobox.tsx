@@ -20,6 +20,7 @@ import styles from "./Combobox.module.scss";
 export interface Option {
   value: string;
   label: string;
+  icon?: string;
 }
 
 export interface ComboboxProps<T extends Option> {
@@ -82,7 +83,7 @@ export function Combobox<T extends Option>({
             <CommandEmpty>No options found.</CommandEmpty>
           )}
 
-          <CommandGroup>
+          <CommandGroup className={styles.commandGroup}>
             {filteredOptions.map((option) => (
               <CommandItem
                 key={option.value}
@@ -90,7 +91,13 @@ export function Combobox<T extends Option>({
                 onSelect={() => handleSelect(option.value)}
                 className={styles.commandItem}
               >
-                {option.label}
+                <div>
+                  {option.label}
+                  {option.icon && (
+                    <span dangerouslySetInnerHTML={{ __html: option.icon }} />
+                  )}
+                </div>
+
                 {selectedValue === option.value && (
                   <CheckIcon className={styles.icon} />
                 )}
