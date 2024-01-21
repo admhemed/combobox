@@ -16,8 +16,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-interface ComboboxProps<T extends { value: string; label: string }> {
+interface Option {
+  value: string;
+  label: string;
+}
+interface ComboboxProps<T extends Option> {
   value: string;
   onChange: (value: string) => void;
   options: T[];
@@ -25,7 +28,7 @@ interface ComboboxProps<T extends { value: string; label: string }> {
   label?: string;
 }
 
-export function Combobox<T extends { value: string; label: string }>({
+export function Combobox<T extends Option>({
   value,
   onChange,
   options,
@@ -46,10 +49,13 @@ export function Combobox<T extends { value: string; label: string }>({
   const handleSelect = (currentValue: string): void => {
     onChange(currentValue === value ? "" : currentValue);
     setOpen(false);
+    setInputValue("");
   };
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>): void => {
+    // console.log("key pressed", event, event.key, inputValue);
     if (event.key === "Enter" && inputValue) {
+      setOpen(false);
       const newOption: T = {
         value: inputValue.toLowerCase(),
         label: inputValue,
@@ -57,8 +63,8 @@ export function Combobox<T extends { value: string; label: string }>({
       if (!options.some((option) => option.value === newOption.value)) {
         updateOptions([...options, newOption]);
       }
+
       handleSelect(newOption.value);
-      setInputValue("");
     }
   };
 
@@ -80,12 +86,18 @@ export function Combobox<T extends { value: string; label: string }>({
       </PopoverTrigger>
 
       <PopoverContent style={{ width: `${buttonWidth}px` }} className="p-0">
-        <Command onKeyDown={handleKeyPress}>
+        <Command
+
+        // onValueChange={setInputValue}
+        >
           <CommandInput
             placeholder="Search option..."
             className="h-9"
-            value={inputValue}
-            onValueChange={setInputValue}
+            onKeyDown={handleKeyPress}
+            onValueChange={(v) => {
+              console.log("value changed", v);
+              setInputValue(v);
+            }}
           />
           {options.length === 0 && (
             <CommandEmpty>No options found.</CommandEmpty>

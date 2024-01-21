@@ -148,9 +148,10 @@ export default function Home() {
           onChange={handleOptionChange}
           options={options}
           updateOptions={handleUpdateOptions}
-          label="Choose an Option"
+          label="Choose a domain..."
         />
       </div>
+      {selectedOption}
     </main>
   );
 }
