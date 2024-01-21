@@ -18,10 +18,6 @@ export default function Home() {
     sampleData as MyOptionType[]
   );
 
-  const handleUpdateOptions = (newOptions: MyOptionType[]) => {
-    setOptions(newOptions);
-  };
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="w-[370px] items-center justify-between flex border p-2">
@@ -29,7 +25,7 @@ export default function Home() {
           selectedOption={selectedOption}
           onChange={setSelectedOption}
           options={options}
-          updateOptions={handleUpdateOptions}
+          updateOptions={setOptions}
           label="Choose a domain..."
         />
       </div>
