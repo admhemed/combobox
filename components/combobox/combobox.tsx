@@ -47,11 +47,56 @@ export function Combobox() {
   const [value, setValue] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [buttonWidth, setButtonWidth] = useState(0);
+  const [inputValue, setInputValue] = useState("");
+
   useEffect(() => {
     if (buttonRef.current) {
       setButtonWidth(buttonRef.current.offsetWidth);
     }
   }, []);
+  const [frameworks, setFrameworks] = useState([
+    {
+      value: "next.js",
+      label: "Next.js",
+    },
+    {
+      value: "sveltekit",
+      label: "SvelteKit",
+    },
+    {
+      value: "nuxt.js",
+      label: "Nuxt.js",
+    },
+    {
+      value: "remix",
+      label: "Remix",
+    },
+    {
+      value: "astro",
+      label: "Astro",
+    },
+  ]);
+  const handleSelect = (currentValue: string) => {
+    setValue(currentValue === value ? "" : currentValue);
+    setOpen(false);
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && inputValue) {
+      const newFramework = {
+        value: inputValue.toLowerCase(),
+        label: inputValue,
+      };
+      if (
+        !frameworks.some((framework) => framework.value === newFramework.value)
+      ) {
+        setFrameworks([...frameworks, newFramework]);
+      }
+      handleSelect(newFramework.value);
+      setInputValue("");
+    }
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -70,18 +115,23 @@ export function Combobox() {
       </PopoverTrigger>
 
       <PopoverContent style={{ width: `${buttonWidth}px` }} className="p-0">
-        <Command>
-          <CommandInput placeholder="Search framework..." className="h-9" />
-          <CommandEmpty>No framework found.</CommandEmpty>
+        <Command onKeyDown={handleKeyPress}>
+          <CommandInput
+            placeholder="Search framework..."
+            className="h-9"
+            value={inputValue}
+            onValueChange={setInputValue}
+          />
+          {frameworks.length === 0 && (
+            <CommandEmpty>No framework found.</CommandEmpty>
+          )}
+
           <CommandGroup>
             {frameworks.map((framework) => (
               <CommandItem
                 key={framework.value}
                 value={framework.value}
-                onSelect={(currentValue) => {
-                  setValue(currentValue === value ? "" : currentValue);
-                  setOpen(false);
-                }}
+                onSelect={() => handleSelect(framework.value)}
               >
                 {framework.label}
                 <CheckIcon
