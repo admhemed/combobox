@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useRef, useState, useEffect, KeyboardEvent } from "react";
+import { useRef, useState, useEffect, KeyboardEvent, useMemo } from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import useFilteredOptions from "./filterHook";
 interface Option {
   value: string;
   label: string;
@@ -67,6 +68,7 @@ export function Combobox<T extends Option>({
       handleSelect(newOption.value);
     }
   };
+  const filteredOptions = useFilteredOptions(options, inputValue);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -104,7 +106,7 @@ export function Combobox<T extends Option>({
           )}
 
           <CommandGroup>
-            {options.map((option) => (
+            {filteredOptions.map((option) => (
               <CommandItem
                 key={option.value}
                 value={option.value}
