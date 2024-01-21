@@ -33,7 +33,7 @@ export default function Home() {
           label="Choose a domain..."
         />
       </div>
-      {selectedOption?.label}
+      <div>{JSON.stringify(selectedOption)}</div>
     </main>
   );
 }

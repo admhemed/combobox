@@ -32,10 +32,8 @@ function useCombobox<T extends Option>({
   const filteredOptions = useFilteredOptions(options, inputValue) as T[];
 
   const handleSelect = (option: T): void => {
-    // onChange(option.value === selectedValue ? "" : option.value);
-    onChange(option);
-
     setOpen(false);
+    onChange(option);
     setInputValue("");
   };
 

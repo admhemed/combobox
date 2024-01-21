@@ -89,7 +89,7 @@ export function Combobox<T extends Option>({
               return (
                 <CommandItem
                   key={option.value}
-                  value={`${option.value} ${option.label} ${option.description}`}
+                  value={`${option.value}`}
                   onSelect={() => handleSelect(option)}
                   className={styles.commandItem}
                 >
