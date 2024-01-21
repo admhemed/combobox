@@ -27,7 +27,7 @@ const debounce = <F extends (...args: any[]) => any>(
 const useFilteredOptions = <T extends Option>(
   options: T[],
   inputValue: string,
-  debounceDelay: number = 100 // Default debounce delay in milliseconds
+  debounceDelay: number = 50 // Default debounce delay in milliseconds
 ) => {
   // State to hold the debounced input value
   const [debouncedInputValue, setDebouncedInputValue] = useState(inputValue);
@@ -36,7 +36,7 @@ const useFilteredOptions = <T extends Option>(
   useEffect(() => {
     const handler = debounce(
       () => setDebouncedInputValue(inputValue),
-      debounceDelay
+      inputValue === "" ? debounceDelay * 5 : debounceDelay // If the input value is empty, increase the debounce delay to avoid unnecessary filtering
     );
     handler();
     // Cleanup function to clear the debounce timeout when the component is unmounted or inputValue changes
