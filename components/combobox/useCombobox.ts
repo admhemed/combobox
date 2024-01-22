@@ -47,7 +47,7 @@ function useCombobox<T extends Option>({
           label: inputValue,
         } as T;
 
-        updateOptions([...options, newOption] as T[]);
+        updateOptions([newOption, ...options] as T[]);
 
         handleSelect(newOption);
       }
